@@ -1812,6 +1812,32 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -1820,7 +1846,8 @@ __webpack_require__.r(__webpack_exports__);
     return {
       files: [],
       isLoading: false,
-      error: null
+      error: null,
+      idDelete: null
     };
   },
   components: {
@@ -1829,7 +1856,7 @@ __webpack_require__.r(__webpack_exports__);
   created: function created() {
     var _this = this;
 
-    _app_js__WEBPACK_IMPORTED_MODULE_2__["EventBus"].$on('uploadComplete', function (c) {
+    _app_js__WEBPACK_IMPORTED_MODULE_2__["EventBus"].$on("uploadComplete", function (c) {
       _this.list();
     });
   },
@@ -1842,7 +1869,7 @@ __webpack_require__.r(__webpack_exports__);
 
       this.files = [];
       this.isLoading = true;
-      axios.get('api/file/list').then(function (resp) {
+      axios.get("api/file/list").then(function (resp) {
         _this2.files = resp.data;
         _this2.isLoading = false;
       });
@@ -1854,15 +1881,15 @@ __webpack_require__.r(__webpack_exports__);
       this.error = null;
       var that = this;
       axios({
-        url: 'api/file/get/' + id,
-        method: 'GET',
-        responseType: 'blob' // important
+        url: "api/file/get/" + id,
+        method: "GET",
+        responseType: "blob" // important
 
       }).then(function (response) {
         var url = window.URL.createObjectURL(new Blob([response.data]));
-        var link = document.createElement('a');
+        var link = document.createElement("a");
         link.href = url;
-        link.setAttribute('download', name);
+        link.setAttribute("download", name);
         document.body.appendChild(link);
         link.click();
         that.isLoading = false;
@@ -1872,24 +1899,27 @@ __webpack_require__.r(__webpack_exports__);
         _this3.error = err;
       });
     },
-    deleteFile: function deleteFile(id, key) {
+    deleteFile: function deleteFile() {
       var _this4 = this;
 
-      this.isLoading = true;
-      this.error = null;
-      var that = this;
-      axios({
-        url: 'api/file/delete/' + id,
-        method: 'DELETE'
-      }).then(function (response) {
-        _this4.list();
+      if (this.idDelete) {
+        var id = this.idDelete;
+        this.isLoading = true;
+        this.error = null;
+        var that = this;
+        axios({
+          url: "api/file/delete/" + id,
+          method: "DELETE"
+        }).then(function (response) {
+          _this4.list();
 
-        that.isLoading = false;
-      }).catch(function (err) {
-        that.isLoading = false;
-        console.log(err);
-        _this4.error = err;
-      });
+          that.isLoading = false;
+        }).catch(function (err) {
+          that.isLoading = false;
+          console.log(err);
+          _this4.error = err;
+        });
+      }
     }
   }
 });
@@ -37846,7 +37876,7 @@ var render = function() {
           ? _c(
               "div",
               { staticClass: "alert alert-danger", attrs: { role: "alert" } },
-              [_vm._v("\n      " + _vm._s(_vm.error) + "\n    ")]
+              [_vm._v(_vm._s(_vm.error))]
             )
           : _vm._e(),
         _vm._v(" "),
@@ -37878,9 +37908,13 @@ var render = function() {
                 _c(
                   "td",
                   {
+                    attrs: {
+                      "data-toggle": "modal",
+                      "data-target": "#exampleModal"
+                    },
                     on: {
                       click: function($event) {
-                        return _vm.deleteFile(file.id, key)
+                        _vm.idDelete = file.id
                       }
                     }
                   },
@@ -37890,7 +37924,58 @@ var render = function() {
             }),
             0
           )
-        ])
+        ]),
+        _vm._v(" "),
+        _c(
+          "div",
+          {
+            staticClass: "modal fade",
+            attrs: {
+              id: "exampleModal",
+              tabindex: "-1",
+              role: "dialog",
+              "aria-labelledby": "exampleModalLabel",
+              "aria-hidden": "true"
+            }
+          },
+          [
+            _c(
+              "div",
+              { staticClass: "modal-dialog", attrs: { role: "document" } },
+              [
+                _c("div", { staticClass: "modal-content" }, [
+                  _vm._m(3),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "modal-footer" }, [
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-secondary",
+                        attrs: { type: "button", "data-dismiss": "modal" },
+                        on: {
+                          click: function($event) {
+                            _vm.idDelete = null
+                          }
+                        }
+                      },
+                      [_vm._v("Close")]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-danger",
+                        attrs: { type: "button", "data-dismiss": "modal" },
+                        on: { click: _vm.deleteFile }
+                      },
+                      [_vm._v("Delete")]
+                    )
+                  ])
+                ])
+              ]
+            )
+          ]
+        )
       ])
     ],
     1
@@ -37927,6 +38012,31 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("span", { staticClass: "icon-red" }, [
       _c("span", [_c("i", { staticClass: "fas fa-trash-alt" })])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "modal-header" }, [
+      _c(
+        "h5",
+        { staticClass: "modal-title", attrs: { id: "exampleModalLabel" } },
+        [_vm._v("Confirm Delete File ?")]
+      ),
+      _vm._v(" "),
+      _c(
+        "button",
+        {
+          staticClass: "close",
+          attrs: {
+            type: "button",
+            "data-dismiss": "modal",
+            "aria-label": "Close"
+          }
+        },
+        [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+      )
     ])
   }
 ]
@@ -50403,15 +50513,14 @@ if (token) {
 /*!*******************************************************!*\
   !*** ./resources/js/components/DownloadComponent.vue ***!
   \*******************************************************/
-/*! no static exports found */
+/*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _DownloadComponent_vue_vue_type_template_id_0157a7fa_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./DownloadComponent.vue?vue&type=template&id=0157a7fa&scoped=true& */ "./resources/js/components/DownloadComponent.vue?vue&type=template&id=0157a7fa&scoped=true&");
 /* harmony import */ var _DownloadComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./DownloadComponent.vue?vue&type=script&lang=js& */ "./resources/js/components/DownloadComponent.vue?vue&type=script&lang=js&");
-/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _DownloadComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _DownloadComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__[key]; }) }(__WEBPACK_IMPORT_KEY__));
-/* harmony import */ var _DownloadComponent_vue_vue_type_style_index_0_id_0157a7fa_lang_less_scoped_true___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./DownloadComponent.vue?vue&type=style&index=0&id=0157a7fa&lang=less&scoped=true& */ "./resources/js/components/DownloadComponent.vue?vue&type=style&index=0&id=0157a7fa&lang=less&scoped=true&");
+/* empty/unused harmony star reexport *//* harmony import */ var _DownloadComponent_vue_vue_type_style_index_0_id_0157a7fa_lang_less_scoped_true___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./DownloadComponent.vue?vue&type=style&index=0&id=0157a7fa&lang=less&scoped=true& */ "./resources/js/components/DownloadComponent.vue?vue&type=style&index=0&id=0157a7fa&lang=less&scoped=true&");
 /* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
@@ -50443,7 +50552,7 @@ component.options.__file = "resources/js/components/DownloadComponent.vue"
 /*!********************************************************************************!*\
   !*** ./resources/js/components/DownloadComponent.vue?vue&type=script&lang=js& ***!
   \********************************************************************************/
-/*! no static exports found */
+/*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -50661,8 +50770,8 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! /home/leandro/Desktop/reso/resources/js/app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! /home/leandro/Desktop/reso/resources/sass/app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! C:\Users\leandro.vitto\ProjectsMy\laraveldropbox\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! C:\Users\leandro.vitto\ProjectsMy\laraveldropbox\resources\sass\app.scss */"./resources/sass/app.scss");
 
 
 /***/ })

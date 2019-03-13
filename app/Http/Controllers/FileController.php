@@ -9,16 +9,16 @@ use Illuminate\Support\Facades\Storage;
 
 class FileController extends Controller
 {
-    const DIRECTORY = 'source';
-    //
+
+
     public function list(Request $request){
-            $files = FileUpload::where('source','source')->get();
+            $files = FileUpload::where(['source' => 'source', 'user_id' => Auth::user()->id])->get();
             $fileOutput = [];
             foreach($files as $file){
-                $obj = [  
+                $obj = [
                     "id"   => $file->id,
-                    "name" => $file->file_name,  
-                    "nameFile" => $file->file_name,  
+                    "name" => $file->file_name,
+                    "nameFile" => $file->file_name,
                     //"size" => Storage::disk('dropbox')->size($file),
                     //"lastModified" => date('m/d/Y', Storage::disk('dropbox')->lastModified($file)),
                 ];
@@ -28,28 +28,28 @@ class FileController extends Controller
     }
 
     public function listCloud(Request $request){
-            $files = Storage::disk('dropbox')->allFiles(FileController::DIRECTORY);
+            $files = Storage::disk('dropbox')->allFiles(env('DROPBOX_FOLDER'));
             $fileOutput = [];
             foreach($files as $file){
-                $obj = [  
+                $obj = [
                     "id"   => '24',
-                    "name" => $file,  
-                    "nameFile" => $file,  
+                    "name" => $file,
+                    "nameFile" => $file,
                     //"size" => Storage::disk('dropbox')->size($file),
                     //"lastModified" => date('m/d/Y', Storage::disk('dropbox')->lastModified($file)),
                 ];
                 array_push($fileOutput,$obj);
             }
             return response()->json($fileOutput, 200);
-        
+
     }
-    
+
     public function get(Request $request,$idFile){
         $file = FileUpload::find($idFile);
         if(!$file)
             return response()->json('File Not Found', 400);
         $fileName = $file ->file_name;
-        $path = FileController::DIRECTORY ."/". $fileName;
+        $path = env('DROPBOX_FOLDER') ."/". $fileName;
         if(Storage::disk('dropbox')->exists($path)){
             return Storage::disk('dropbox')->download($path);
         }else{
@@ -62,7 +62,7 @@ class FileController extends Controller
         if(!$file)
             return response()->json('File Not Found', 400);
         $fileName = $file ->file_name;
-        $path = FileController::DIRECTORY ."/". $fileName;
+        $path = env('DROPBOX_FOLDER') ."/". $fileName;
         if(Storage::disk('dropbox')->exists($path)){
             Storage::disk('dropbox')->delete($path);
             $file->delete();
@@ -73,7 +73,7 @@ class FileController extends Controller
     }
 
     public function store(Request $request){
-    
+
         if($request->hasFile('files')){
             $fileArray = $request->file('files');
 
@@ -85,17 +85,17 @@ class FileController extends Controller
                         $path= Storage::disk('dropbox')->putFileAs('source',$file,$fileName);
                         //$path= Storage::disk('dropbox')->put('source',$file);
                         $files = FileUpload::where('file_name',$fileName)->first();
-                        
+
                         if($path != null && $files == null){
                             $fileUpload = new FileUpload();
                             $fileUpload->file_name= $fileName;
                             $fileUpload->user_id= Auth::user()->id;
                             $fileUpload->save();
                         }
-                        
+
                     }
                 }catch(\Excpetion $ex){
-                    
+
                 }
             }
 
