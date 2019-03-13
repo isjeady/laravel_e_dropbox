@@ -1,0 +1,17 @@
+1-Download Application
+2-Open terminal
+3- Launch : composer install
+4- Copy Artisan File : cp .env.example .env
+5- Open .env e set Database Connection
+6-Create Database dropbox
+7-launch php artisan migrate
+8-launche php artisan db:seed //create admin
+9-configure Dropbox key e directory
+
+Go to https://www.dropbox.com/developers
+
+php artisan serve
+go to 127.0.0.1:8000
+
+User:admin@admin.com
+PW: adminadmin
