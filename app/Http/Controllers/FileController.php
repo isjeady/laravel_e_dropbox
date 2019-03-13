@@ -82,7 +82,7 @@ class FileController extends Controller
                     if($file->isValid()){
                         $fileName = $file->getClientOriginalName();//.".". $file->getClientOriginalExtension();
                         //$fileName = time() . str_random(12).".". $file->getClientOriginalExtension();
-                        $path= Storage::disk('dropbox')->putFileAs('source',$file,$fileName);
+                        $path= Storage::disk('dropbox')->putFileAs(env('DROPBOX_FOLDER'),$file,$fileName);
                         //$path= Storage::disk('dropbox')->put('source',$file);
                         $files = FileUpload::where('file_name',$fileName)->first();
 
