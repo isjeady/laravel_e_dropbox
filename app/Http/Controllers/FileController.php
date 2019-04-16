@@ -61,7 +61,7 @@ class FileController extends Controller
         $file = FileUpload::find($idFile);
         if(!$file)
             return response()->json('File Not Found', 400);
-        $fileName = $file ->file_name;
+        $fileName = $file->file_name;
         $path = env('DROPBOX_FOLDER') ."/". $fileName;
         if(Storage::disk('dropbox')->exists($path)){
             Storage::disk('dropbox')->delete($path);
